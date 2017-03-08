@@ -16,3 +16,12 @@ def setData(filename):
     return data
 trainData = setData('train-set1.csv')
 testData = setData('test-set1.csv')
+
+#1c
+count = 0
+for v in trainData['goodForGroups']:
+     if v=='1':count+=1
+p_yes=count/float(len(trainData['goodForGroups']))
+p_no=1-p_yes
+print(p_yes)
+print(p_no)

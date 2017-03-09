@@ -12,7 +12,10 @@ def setData(filename):
         data[h] = []
     for row in reader:
         for h, v in zip(headers, row):
-            data[h].append(v)
+            if len(v) <1:
+                data[h].append('BLANK')
+            else:
+                data[h].append(v)
     return data
 trainData = setData('train-set1.csv')
 testData = setData('test-set1.csv')
@@ -22,12 +25,16 @@ print(len(testData['goodForGroups']))
 count = 0
 for v in trainData['goodForGroups']:
      if v=='1':count+=1
-p_yes=count/float(len(trainData['goodForGroups']))
-p_no=1-p_yes
+p_yes=str(count)+ "/" +str(len(trainData['goodForGroups']))
+p_no= str(len(trainData['goodForGroups'])-count) + "/" + str(len(trainData['goodForGroups']))
 print(p_yes)
 print(p_no)
-total = 0;
+p_yes_laplace=(count+1)/(float(len(trainData['goodForGroups']))+2)
+p_no_laplace =1- p_yes_laplace
+print(p_yes_laplace)
+print(p_no_laplace)
 #1d
+total = 0;
 for k in trainData.keys():
     attSet=set()
     for v in trainData[k]:

@@ -49,6 +49,14 @@ for v in trainData.keys():
             if k not in mles['0'][v]:
                 mles['0'][v][k]=0;
             mles['0'][v][k]=mles['0'][v][k]+1
+kVals={}
+for k in trainData.keys():
+    if k == classLabel:
+        continue
+    attSet=set()
+    for v in trainData[k]:
+        attSet.add(v)
+        kVals[k]=len(attSet)
 theSet = ['0','1']
 for n in theSet:
     for v in trainData.keys():
@@ -56,27 +64,53 @@ for n in theSet:
             continue
         denom = sum(mles[n][v].values())
         for k in mles[n][v].keys():
-            mles[n][v][k] = mles[n][v][k]/float(denom)
+            mles[n][v][k] = (mles[n][v][k] + 1)/(float(denom+kVals[v]))
             # print v+":"+k+":"+str(mles[n][v][k])
 #use test data
 result=[]
-target = open("test.txt",'w')
-result = {'0':[],'1':[]}
-for y in result:
-    for i in range(len(testData[classLabel])):
-        prob=1;
-        for k in testData.keys():
-            if k == classLabel:
-                continue
-            observed = testData[k][i]
-            if observed not in mles[y][k]:
-                #dosomething
-                continue
-            else:
-                # print str(i) +": "+ k +":" +observed
-                # print mles[y][k][observed]
-                prob = prob * mles[y][k][observed]
-        prob=prob*classPrior[y]
-        result[y].append(prob)
-    for i,k in enumerate(result[y]):
-        target.write(str(i)+":" +str(k)+"\n")
+p_i={}
+p_i['1']=[]
+p_i['0']=[]
+for i in range(len(testData[classLabel])):
+    probZero=1;
+    probOne=1;
+    for k in testData.keys():
+        if k == classLabel:
+            continue
+        observed = testData[k][i]
+        if observed not in mles['0'][k] or observed not in mles['1'][k]:
+            if observed not in trainData[k]:
+                y_i = 0;
+                for p in trainData[classLabel]:
+                    if p == '0':
+                        y_i=y_i+1
+                probZero=probZero*1/float(y_i+kVals[k])
+            if observed not in trainData[k]:
+                y_i = 0;
+                for p in trainData[classLabel]:
+                    if p == '1':
+                        y_i=y_i+1
+                probOne=probOne *1/float(y_i+kVals[k])
+        else:
+            # print str(i) +": "+ k +":" +observed
+            # print mles[y][k][observed]
+            probZero = probZero * mles['0'][k][observed]
+            probOne = probOne * mles['1'][k][observed]
+    probZero=probZero*classPrior['0']
+    p_i['0'].append(probZero)
+    probOne=probOne*classPrior['1']
+    p_i['1'].append(probOne)
+    if probZero > probOne:
+        result.append('0')
+    else:
+        result.append('1')
+
+rows = len(testData[classLabel])
+wrongCount = 0
+for i,k in enumerate(result):
+    if(testData[classLabel][i]!=k):
+        wrongCount=wrongCount+1
+print "ZERO-ONE LOSS="+str(wrongCount/float(rows))
+squarecount=0
+print p_i['0'][0]+p_i['1'][0]
+print "SQUARED LOSS=" + str(((rows-wrongCount)/float(rows))**2/float(rows))

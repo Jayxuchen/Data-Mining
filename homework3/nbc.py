@@ -78,28 +78,30 @@ for i in range(len(testData[classLabel])):
         if k == classLabel:
             continue
         observed = testData[k][i]
-        if observed not in mles['0'][k] or observed not in mles['1'][k]:
-            if observed not in trainData[k]:
-                y_i = 0;
-                for p in trainData[classLabel]:
-                    if p == '0':
-                        y_i=y_i+1
-                probZero=probZero*1/float(y_i+kVals[k])
-            if observed not in trainData[k]:
-                y_i = 0;
-                for p in trainData[classLabel]:
-                    if p == '1':
-                        y_i=y_i+1
-                probOne=probOne *1/float(y_i+kVals[k])
+
+        if observed not in mles['0'][k]:
+            y_i = 0;
+            for p in trainData[classLabel]:
+                if p == '0':
+                    y_i=y_i+1
+            probZero=probZero*1/float(y_i+kVals[k])
         else:
-            # print str(i) +": "+ k +":" +observed
-            # print mles[y][k][observed]
             probZero = probZero * mles['0'][k][observed]
+
+        if observed not in mles['1'][k]:
+            y_i = 0;
+            for p in trainData[classLabel]:
+                if p == '1':
+                    y_i=y_i+1
+            probOne=probOne *1/float(y_i+kVals[k])
+        else:
             probOne = probOne * mles['1'][k][observed]
+
     probZero=probZero*classPrior['0']
-    p_i['0'].append(probZero/(probZero+probOne))
     probOne=probOne*classPrior['1']
-    p_i['1'].append(probOne/(probZero+probOne))
+    denom = probZero+probOne
+    p_i['0'].append(probZero/denom)
+    p_i['1'].append(probOne/denom)
     if probZero > probOne:
         result.append('0')
     else:
@@ -111,6 +113,11 @@ for i,k in enumerate(result):
     if(testData[classLabel][i]!=k):
         wrongCount=wrongCount+1
 print "ZERO-ONE LOSS="+str(wrongCount/float(rows))
-squarecount=0
-print p_i['0'][0]+p_i['1'][0]
-print "SQUARED LOSS=" + str(((rows-wrongCount)/float(rows))**2/float(rows))
+squareCount=0
+i = 0
+for j,k in zip(p_i['1'],p_i['0']):
+    subval = 1 - float(result[i]) * j - (1-float(result[i])) * k
+    squareCount = squareCount+subval**2
+    i+=1
+
+print "SQUARED LOSS=" + str(squareCount/float(rows))

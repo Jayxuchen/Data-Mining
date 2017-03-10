@@ -1,0 +1,7 @@
+get all conditional probabilities
+
+iterate for each value of Y
+    for all rows
+        get conditional probability of each column
+        multiply all probabilities together along with class prior = total
+        set probability for result[Y][row] to be total

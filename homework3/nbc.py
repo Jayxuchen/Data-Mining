@@ -60,21 +60,23 @@ for n in theSet:
             # print v+":"+k+":"+str(mles[n][v][k])
 #use test data
 result=[]
-for i in range(len(testData[classLabel])):
-    prob=1;
-    for k in testData.keys():
-        if k == classLabel:
-            continue
-        observed = testData[k][i]
-        y = testData[classLabel][i]
-        if observed not in mles[y][k]:
-            #dosomething
-            continue
-        else:
-            print str(i) +": "+ k +":" +observed
-            print mles[y][k][observed]
-            prob = prob * mles[y][k][observed]
-    prob=prob*classPrior[y]
-    result.append(prob)
-for i,k in enumerate(result):
-    print str(i)+":" +str(k)
+target = open("test.txt",'w')
+result = {'0':[],'1':[]}
+for y in result:
+    for i in range(len(testData[classLabel])):
+        prob=1;
+        for k in testData.keys():
+            if k == classLabel:
+                continue
+            observed = testData[k][i]
+            if observed not in mles[y][k]:
+                #dosomething
+                continue
+            else:
+                # print str(i) +": "+ k +":" +observed
+                # print mles[y][k][observed]
+                prob = prob * mles[y][k][observed]
+        prob=prob*classPrior[y]
+        result[y].append(prob)
+    for i,k in enumerate(result[y]):
+        target.write(str(i)+":" +str(k)+"\n")

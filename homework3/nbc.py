@@ -97,9 +97,9 @@ for i in range(len(testData[classLabel])):
             probZero = probZero * mles['0'][k][observed]
             probOne = probOne * mles['1'][k][observed]
     probZero=probZero*classPrior['0']
-    p_i['0'].append(probZero)
+    p_i['0'].append(probZero/(probZero+probOne))
     probOne=probOne*classPrior['1']
-    p_i['1'].append(probOne)
+    p_i['1'].append(probOne/(probZero+probOne))
     if probZero > probOne:
         result.append('0')
     else:

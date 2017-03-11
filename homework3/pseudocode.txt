@@ -5,3 +5,29 @@ iterate for each value of Y
         get conditional probability of each column
         multiply all probabilities together along with class prior = total
         set probability for result[Y][row] to be total
+
+pseudocode for squared loss
+
+count array with all the counts for each value of attr X given class Y
+
+kval array which is a dictionary of # parameters for each attrSet
+
+mle array - given class Y
+    for each value of attr x given Y = count of value + 1 / (sum of values of attr x + kval[attribute])
+
+
+iterate over each row
+    start probZero=1, probOne = 1
+    iterate over each attribute
+        observed = value of attribute X given Y at a certain row
+        if observed is not found in training data given Y
+            probZero=probZero*1/float((count of Y= (0|1))+kVals[attr])
+        else
+            probZero = probZero * mle of observed value of attribute X given Y
+        do same for same if/else for other Y
+    probZero=probZero*classPrior['0']
+    probOne=probOne*classPrior['1']
+    denom = probZero+probOne
+    store all p_i values in dictionary
+    p_i['0'].append(probZero/denom)
+    p_i['1'].append(probOne/denom)

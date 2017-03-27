@@ -65,8 +65,12 @@ atts = ['priceRange','alcohol','noiseLevel','attire']
 for a in atts:
     for k,n in zip(count['1'][a],count['0'][a]):
         print "Smoothing"
-        print "P("+a+"="+k+"|Y=1)= " + str(count['1'][a][k]+1)+"/"+str(sum(count['1']['priceRange'].values())+kVals[a])
-        print "P("+a+"="+k+"|Y=0)= " + str(count['0'][a][k]+1)+"/"+str(sum(count['0']['priceRange'].values())+kVals[a])
+        print "P("+a+"="+k+"|Y=1)= " + str(count['1'][a][k]+1)+"/"+str(sum(count['1'][a].values())+kVals[a])
+        print "P("+a+"="+k+"|Y=1)= " + str((count['1'][a][k]+1)/float(sum(count['1'][a].values())+kVals[a]))
+        print "P("+a+"="+k+"|Y=0)= " + str(count['0'][a][k]+1)+"/"+str(sum(count['0'][a].values())+kVals[a])
+        print "P("+a+"="+k+"|Y=0)= " + str((count['0'][a][k]+1)/float(sum(count['0'][a].values())+kVals[a]))
         print "NO Smoothing"
-        print "P("+a+"="+k+"|Y=1)= " + str(count['1'][a][k])+"/"+str(sum(count['1']['priceRange'].values()))
-        print "P("+a+"="+k+"|Y=0)= " + str(count['0'][a][k])+"/"+str(sum(count['0']['priceRange'].values()))
+        print "P("+a+"="+k+"|Y=1)= " + str(count['1'][a][k])+"/"+str(sum(count['1'][a].values()))
+        print "P("+a+"="+k+"|Y=1)= " + str(count['1'][a][k]/float(sum(count['1'][a].values())))
+        print "P("+a+"="+k+"|Y=0)= " + str(count['0'][a][k])+"/"+str(sum(count['0'][a].values()))
+        print "P("+a+"="+k+"|Y=0)= " + str(count['0'][a][k]/float(sum(count['0'][a].values())))

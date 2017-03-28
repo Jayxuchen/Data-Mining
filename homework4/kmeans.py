@@ -24,8 +24,8 @@ def setData(filename):
             point.append(float(selectData[h][i]))
         points.append(point)
     return points
-def distance(point1, point2):
-    return ((point1[0]-point2[0])**2+(point1[1]-point2[1])**2+(point1[2]-point2[2])**2+(point1[3]-point2[3])**2)**1/2
+def distance(c1, c2):
+    return ((c1[0]-c2[0])**2+(c1[1]-c2[1])**2+(c1[2]-c2[2])**2+(c1[3]-c2[3])**2)**1/2
 def closest_centroid(data,centroids):
     minIndexes=[]
     for point in data:
@@ -38,6 +38,12 @@ def printCentroids(centroids):
     for i,centroid in enumerate(centroids):
         print "centroid"+str(i+1)+"="+str(centroid)
     print
+def printSSE(clusters,centroids):
+    tot = 0
+    for centroid,cluster in zip(centroids,clusters):
+        for point in cluster:
+            tot+=(distance(point,centroid)**2)
+    print "WC-SSE="+str(tot)
 data = setData(sys.argv[1])
 rows = len(data)
 kValue = int(sys.argv[2])
@@ -51,7 +57,7 @@ randomNums = random.sample(range(0,rows),kValue)
 # get random initial centroids
 for i in randomNums:
     centroids.append(data[i])
-printCentroids(centroids)
+# printCentroids(centroids)
 #get array of index of closest centroid for each point
 while True:
     closestCentroid = closest_centroid(data,centroids)
@@ -83,5 +89,6 @@ while True:
     if same == False:
         centroids= newCentroids
     else:
+        printSSE(clusters,centroids)
         printCentroids(newCentroids)
         break

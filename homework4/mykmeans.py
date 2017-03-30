@@ -56,6 +56,12 @@ def distance(c1, c2):
         return abs(c1[0]-c2[0])+abs(c1[1]-c2[1])+abs(c1[2]-c2[2])+abs(c1[3]-c2[3])
     else:
         return ((c1[0]-c2[0])**2+(c1[1]-c2[1])**2+(c1[2]-c2[2])**2+(c1[3]-c2[3])**2)**(1/2.0)
+def centroidDistance(centroids):
+    tot=0
+    for k in centroids:
+        for p in centroids:
+            tot+=(distance(k,p)**2)
+    return tot
 def closest_centroid(data,centroids):
     minIndexes=[]
     for point in data:
@@ -72,7 +78,8 @@ def printSSE(clusters,centroids):
     for centroid,cluster in zip(centroids,clusters):
         for point in cluster:
             tot+=(distance(point,centroid)**2)
-    print "WC-SSE="+str(tot)
+    tot= tot/centroidDistance(centroids)
+    print "F-SSE="+str(tot)
 def plotClusters(option, clusters,centroids):
     attribute1=0
     attribute2=0

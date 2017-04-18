@@ -3,10 +3,9 @@ import numpy as np
 from  itertools import chain,combinations
 from operator import itemgetter
 binaryAtts=['delivery','waiterService','caters']
-dataSize = 0
+dataSize = 9337
 def setData(filename):
     global binaryAtts
-    global dataSize
     trainingDataFilename =open(filename)
     reader = csv.reader(trainingDataFilename)
     headers = reader.next()
@@ -20,7 +19,7 @@ def setData(filename):
     for row in reader:
         for h, v in zip(headers, row):
             data[h].append(v)
-            sets[h].add(v.replace(" ","_"))
+            sets[h].add(v)
     for k in matrix.keys():
         if k in binaryAtts:
             matrix[k] = []
@@ -28,10 +27,7 @@ def setData(filename):
             for n in sets[k]:
                 matrix[k][n]=[]
     # matrix['rating']['4'][]
-    # print data.keys()
-    dataSize = len(data['delivery'])
-    # print dataSize
-    for x in range(dataSize):
+    for x in range(9337):
         for k in matrix.keys():
             if k in binaryAtts:
                 if data[k][x] == 'TRUE':
@@ -77,7 +73,7 @@ def ruleGeneration(frequentItemsets, minconf):
                     candidateRules.append(notf+"->"+f)
 
     # print len(candidateRules)
-    possibleRules={}
+    associationRules={}
     for r in candidateRules:
         arr = r.split("->")
         a = arr[0]
@@ -91,15 +87,7 @@ def ruleGeneration(frequentItemsets, minconf):
         abSupport = getSupport(abItems)
         aSupport = getSupport(aItems)
         bSupport = getSupport(bItems)
-        # if b == "goodForGroups$1":
-        #     print r
-        #     print abSupport
-        #     print bSupport
-        possibleRules["{"+a.replace(" ",",")+"}->"+b] = [abSupport, abSupport / float(aSupport)]
-    associationRules={}
-    for r in possibleRules.keys():
-        if possibleRules[r][1] >= minconf:
-            associationRules[r]=possibleRules[r]
+        associationRules["{"+arr[0].replace(" ",",")+"}->"+arr[1]] = [abSupport / float(bSupport) / float(aSupport), abSupport]
     return associationRules
 def generateInitialCandidates(matrix):
     global dataSize
@@ -161,16 +149,9 @@ def candidatesItemsetGeneration(frequentItemsets,minsup):
                 isValid = False
         if isValid:
             prunedItemset.append(c)
-    # for i in prunedItemset: print i
     # print prunedItemset
-    # nextItemset = calculateSupports(prunedItemset)
-    nextItemset={}
-    for subset in prunedItemset:
-        count = 0
-        newKey=""
-        for item in subset:
-            newKey+=item+" "
-        nextItemset[newKey.strip()]=getSupport(subset)
+    # for i in prunedItemset: print i
+    nextItemset = calculateSupports(prunedItemset)
     # for i in nextItemset.items(): print i
     # print
     return nextItemset
@@ -195,7 +176,7 @@ def getSupport(array):
                     break
         if isValid:
             count+=1
-            # print str(array) + str(i)
+            # print str(subset) + str(i)
     return count/float(dataSize)
 def calculateSupports(keyList):
     global binaryAtts
@@ -244,9 +225,7 @@ def frequentItemsetGeneration(matrix, minsup):
     frequentItems.append(pruneCandidates(candidates[i],minsup))
     # print "frequent items "+ str(1) + " " + str(len(frequentItems[0]))
     # print frequentItems[i]
-    # for items in frequentItems[0].items():print items
     # print
-    total = 0
     while len(frequentItems[i]) != 0:
         candidates.append(candidatesItemsetGeneration(frequentItems[i],minsup))
         # for items in candidates[i+1].items():print items
@@ -255,12 +234,10 @@ def frequentItemsetGeneration(matrix, minsup):
         # for items in frequentItems[i+1].items():print items
         # print
         print "frequent itemsets size "+ str(i+1) + " - " + str(len(frequentItems[i]))
-        total+=len(frequentItems[i])
         i+=1
     frequentItems.pop()
     # totalFrequentItems = frequentItems[0]
     # for k range(frequentItems[])
-    print "\nTotal itemsets: "+str(total)
     return frequentItems
 if len(sys.argv) !=4:
     print("invalid number of arguments : correct usage \"python association-rules.py yelp4.csv minsup minconf\"")
@@ -270,9 +247,6 @@ minsup = float(sys.argv[2])
 minconf = float(sys.argv[3])
 matrix = setData(filename)
 rules=computeApriori(matrix,minsup,minconf)
-# print getSupport(['alcohol$none','attire$casual','noiseLevel$average'])
-# print getSupport(['alcohol$none','goodForGroups$1','noiseLevel$average'])
-
-print "Total Association rules with single-variables in the consequent: "+ str(len(rules))
+print "number of rules: "+str(len(rules))
 d = collections.OrderedDict(sorted(rules.items(), key=itemgetter(1)))
-# for i in  d.keys():print "("+  i + ") support: " + str(d[i][0]) + " confidence: " + str(d[i][1])
+for i in  d.keys(): print i + " lift: " + str(d[i][0]) + " support: " + str(d[i][1])
